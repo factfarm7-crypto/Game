@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcane Battle Arena - 3D Multiplayer Shooter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a0e17;
+            --secondary: #1a1f2e;
+            --accent: #ff4655;
+            --accent-light: #ff6b7a;
+            --accent-dark: #d32f3f;
+            --text: #ffffff;
+            --text-secondary: #b0b7c3;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --magic-fire: linear-gradient(45deg, #ff3300, #ff9900);
+            --magic-ice: linear-gradient(45deg, #00ccff, #0066ff);
+            --magic-electric: linear-gradient(45deg, #ffff00, #ffcc00);
+            --magic-shadow: linear-gradient(45deg, #6600cc, #330066);
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: rgba(10, 14, 23, 0.95);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 2px solid var(--accent);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            color: var(--accent);
+            font-size: 2.2rem;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(to right, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .coin-display {
+            display: flex;
+            align-items: center;
+            background-color: var(--secondary);
+            padding: 8px 15px;
+            border-radius: 50px;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .coin-icon {
+            color: var(--gold);
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(255, 70, 85, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 70, 85, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            background: radial-gradient(circle at 30% 20%, rgba(26, 31, 46, 0.9) 0%, rgba(10, 14, 23, 1) 70%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .hero-visual {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .game-preview {
+            width: 100%;
+            max-width: 500px;
+            height: 350px;
+            background-color: var(--secondary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 70, 85, 0.3);
+        }
+
+        .game-preview::after {
+            content: 'LIVE GAMEPLAY';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--accent);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .character-showcase {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .character-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            overflow: hidden;
+            background-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .character-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Features Section */
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        .features {
+            padding: 100px 0;
+            background-color: var(--secondary);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--primary);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .feature-1 .feature-icon {
+            background: var(--magic-fire);
+        }
+
+        .feature-2 .feature-icon {
+            background: var(--magic-ice);
+        }
+
+        .feature-3 .feature-icon {
+            background: var(--magic-electric);
+        }
+
+        .feature-4 .feature-icon {
+            background: var(--magic-shadow);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* Characters Section */
+        .characters {
+            padding: 100px 0;
+            background-color: var(--primary);
+        }
+
+        .character-slider {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            padding: 20px 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) var(--secondary);
+        }
+
+        .character-slider::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .character-slider::-webkit-scrollbar-track {
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+
+        .character-slider::-webkit-scrollbar-thumb {
+            background-color: var(--accent);
+            border-radius: 10px;
+        }
+
+        .character-card {
+            min-width: 280px;
+            background-color: var(--secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s;
+        }
+
+        .character-card:hover {
+            transform: scale(1.05);
+        }
+
+        .character-img {
+            height: 200px;
+            background-color: #2a3145;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .character-img i {
+            font-size: 5rem;
+            color: var(--accent);
+        }
+
+        .character-info {
+            padding: 25px;
+        }
+
+        .character-name {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .character-name h3 {
+            font-size: 1.4rem;
+        }
+
+        .character-power {
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .power-fire {
+            background-color: rgba(255, 70, 85, 0.2);
+            color: #ff6b7a;
+        }
+
+        .power-ice {
+            background-color: rgba(0, 204, 255, 0.2);
+            color: #00ccff;
+        }
+
+        .power-electric {
+            background-color: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+        }
+
+        .character-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Store Section */
+        .store {
+            padding: 100px 0;
+            background-color: var(--secondary);
+        }
+
+        .store-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background-color: var(--primary);
+            color: var(--text);
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: rgba(255, 70, 85, 0.1);
+        }
+
+        .store-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .item-card {
+            background-color: var(--primary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+
+        .item-header {
+            padding: 20px;
+            text-align: center;
+            background-color: #1f2538;
+        }
+
+        .item-header i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .item-body {
+            padding: 20px;
+        }
+
+        .item-name {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .item-price {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .rarity {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .rarity-common {
+            background-color: rgba(128, 128, 128, 0.2);
+            color: #808080;
+        }
+
+        .rarity-rare {
+            background-color: rgba(0, 100, 255, 0.2);
+            color: #0064ff;
+        }
+
+        .rarity-epic {
+            background-color: rgba(128, 0, 128, 0.2);
+            color: #800080;
+        }
+
+        .rarity-legendary {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+            color: var(--gold);
+        }
+
+        /* Match Section */
+        .match-types {
+            padding: 100px 0;
+            background-color: var(--primary);
+        }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .match-card {
+            background-color: var(--secondary);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .match-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-10px);
+        }
+
+        .match-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .match-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .match-difficulty {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-easy {
+            background-color: rgba(0, 200, 0, 0.2);
+            color: #00c800;
+        }
+
+        .difficulty-medium {
+            background-color: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+
+        .difficulty-hard {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+
+        .difficulty-pro {
+            background: linear-gradient(45deg, rgba(128, 0, 128, 0.2), rgba(255, 0, 0, 0.2));
+            color: #ff00ff;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #0a0a12;
+            padding: 70px 0 30px;
+            border-top: 2px solid var(--accent);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-icons a:hover {
+            background-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.8rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .user-actions {
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-fire-flame-curved logo-icon"></i>
+                <div class="logo-text">ARCANE ARENA</div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#characters">Characters</a></li>
+                <li><a href="#store">Store</a></li>
+                <li><a href="#matches">Matches</a></li>
+                <li><a href="#features">Features</a></li>
+            </ul>
+            
+            <div class="user-actions">
+                <div class="coin-display">
+                    <i class="fas fa-coins coin-icon"></i>
+                    <span id="coin-balance">12,500</span>
+                </div>
+                <button class="btn" id="play-btn">PLAY NOW</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1>3D BATTLE ARENA</h1>
+                <h2 style="color: var(--accent); margin-bottom: 20px;">Experience Next-Gen Combat</h2>
+                <p>Join the ultimate 3D battle experience with magic powers, customizable characters, and intense PvP matches. Choose your hero, equip powerful skins, and dominate the arena!</p>
+                
+                <div class="hero-buttons">
+                    <button class="btn">START MATCH</button>
+                    <button class="btn btn-secondary">PROFESSIONAL MATCH</button>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="game-preview">
+                    <!-- Game preview area -->
+                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">
+                        <i class="fas fa-gamepad" style="font-size: 4rem;"></i>
+                    </div>
+                </div>
+                
+                <div class="character-showcase">
+                    <div class="character-circle">
+                        <i class="fas fa-fire" style="color:#ff3300; font-size:2.5rem; margin-top:25px; margin-left:25px;"></i>
+                    </div>
+                    <div class="character-circle">
+                        <i class="fas fa-snowflake" style="color:#00ccff; font-size:2.5rem; margin-top:25px; margin-left:25px;"></i>
+                    </div>
+                    <div class="character-circle">
+                        <i class="fas fa-bolt" style="color:#ffff00; font-size:2.5rem; margin-top:25px; margin-left:25px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>GAME FEATURES</h2>
+                <p>Arcane Arena brings a complete battle experience with unique characters, magic powers, and customizable gear</p>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card feature-1">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-ninja"></i>
+                    </div>
+                    <h3>Unique Characters</h3>
+                    <p>Choose from a diverse roster of heroes, each with unique magic powers, strengths, and abilities.</p>
+                    <button class="btn btn-secondary">View Characters</button>
+                </div>
+                
+                <div class="feature-card feature-2">
+                    <div class="feature-icon">
+                        <i class="fas fa-hat-wizard"></i>
+                    </div>
+                    <h3>Magic Powers</h3>
+                    <p>Unlock powerful magic abilities like Fire, Ice, Electric, Shadow, Healing, Shield, and Teleport.</p>
+                    <button class="btn btn-secondary">View Powers</button>
+                </div>
+                
+                <div class="feature-card feature-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <h3>Weapons & Skins</h3>
+                    <p>Customize your arsenal with rare gun skins and character outfits. Upgrade your gear for battle.</p>
+                    <button class="btn btn-secondary">Visit Store</button>
+                </div>
+                
+                <div class="feature-card feature-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3>Coin System</h3>
+                    <p>Earn coins by winning matches and completing missions. Use them to buy characters, powers, and skins.</p>
+                    <button class="btn btn-secondary">Buy Coins</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Characters Section -->
+    <section class="characters" id="characters">
+        <div class="container">
+            <div class="section-title">
+                <h2>CHOOSE YOUR CHARACTER</h2>
+                <p>Each character has unique magic powers and abilities. Select your hero and dominate the arena.</p>
+            </div>
+            
+            <div class="character-slider">
+                <div class="character-card">
+                    <div class="character-img">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="character-info">
+                        <div class="character-name">
+                            <h3>Pyro Blaze</h3>
+                            <div class="character-power power-fire">FIRE</div>
+                        </div>
+                        <p>Master of flames with high damage output. Can ignite enemies and create fire walls.</p>
+                        <div class="character-stats">
+                            <div class="stat">
+                                <div class="stat-value">95</div>
+                                <div class="stat-label">Damage</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">70</div>
+                                <div class="stat-label">Speed</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">85</div>
+                                <div class="stat-label">Defense</div>
+                            </div>
+                        </div>
+                        <button class="btn" style="width:100%;">SELECT CHARACTER</button>
+                    </div>
+                </div>
+                
+                <div class="character-card">
+                    <div class="character-img">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                    <div class="character-info">
+                        <div class="character-name">
+                            <h3>Frost Nova</h3>
+                            <div class="character-power power-ice">ICE</div>
+                        </div>
+                        <p>Controls ice and frost to freeze enemies. Slows opponents and creates ice barriers.</p>
+                        <div class="character-stats">
+                            <div class="stat">
+                                <div class="stat-value">80</div>
+                                <div class="stat-label">Damage</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">65</div>
+                                <div class="stat-label">Speed</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">90</div>
+                                <div class="stat-label">Defense</div>
+                            </div>
+                        </div>
+                        <button class="btn" style="width:100%;">SELECT CHARACTER</button>
+                    </div>
+                </div>
+                
+                <div class="character-card">
+                    <div class="character-img">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="character-info">
+                        <div class="character-name">
+                            <h3>Volt Surge</h3>
+                            <div class="character-power power-electric">ELECTRIC</div>
+                        </div>
+                        <p>Commands lightning to shock and stun enemies. Has the fastest movement speed.</p>
+                        <div class="character-stats">
+                            <div class="stat">
+                                <div class="stat-value">85</div>
+                                <div class="stat-label">Damage</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">95</div>
+                                <div class="stat-label">Speed</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">75</div>
+                                <div class="stat-label">Defense</div>
+                            </div>
+                        </div>
+                        <button class="btn" style="width:100%;">SELECT CHARACTER</button>
+                    </div>
+                </div>
+                
+                <div class="character-card">
+                    <div class="character-img">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div class="character-info">
+                        <div class="character-name">
+                            <h3>Shadow Veil</h3>
+                            <div class="character-power power-fire">SHADOW</div>
+                        </div>
+                        <p>Uses dark energy to become invisible and ambush enemies. Master of stealth tactics.</p>
+                        <div class="character-stats">
+                            <div class="stat">
+                                <div class="stat-value">90</div>
+                                <div class="stat-label">Damage</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">90</div>
+                                <div class="stat-label">Speed</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">75</div>
+                                <div class="stat-label">Defense</div>
+                            </div>
+                        </div>
+                        <button class="btn" style="width:100%;">SELECT CHARACTER</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Store Section -->
+    <section class="store" id="store">
+        <div class="container">
+            <div class="section-title">
+                <h2>IN-GAME STORE</h2>
+                <p>Purchase characters, magic powers, gun skins, and character skins using your earned coins</p>
+            </div>
+            
+            <div class="store-tabs">
+                <button class="tab-btn active" data-tab="characters">Characters</button>
+                <button class="tab-btn" data-tab="powers">Magic Powers</button>
+                <button class="tab-btn" data-tab="gun-skins">Gun Skins</button>
+                <button class="tab-btn" data-tab="character-skins">Character Skins</button>
+            </div>
+            
+            <div class="store-items" id="store-items">
+                <!-- Character Items -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="item-body">
+                        <h3 class="item-name">Pyro Blaze</h3>
+                        <div class="rarity rarity-epic">EPIC</div>
+                        <p>Fire-based character with high damage abilities.</p>
+                        <div class="item-price">
+                            <i class="fas fa-coins"></i>
+                            <span>5,000 Coins</span>
+                        </div>
+                        <button class="btn" style="width:100%;">BUY NOW</button>
+                    </div>
+                </div>
+                
+                <div class="item-card">
+                    <div class="item-header">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                    <div class="item-body">
+                        <h3 class="item-name">Frost Nova</h3>
+                        <div class="rarity rarity-rare">RARE</div>
+                        <p>Ice-based character with freezing abilities.</p>
+                        <div class="item-price">
+                            <i class="fas fa-coins"></i>
+                            <span>3,500 Coins</span>
+                        </div>
+                        <button class="btn" style="width:100%;">BUY NOW</button>
+                    </div>
+                </div>
+                
+                <!-- Gun Skin Items -->
+                <div class="item-card">
+                    <div class="item-header">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="item-body">
+                        <h3 class="item-name">Dragonfire AR</h3>
+                        <div class="rarity rarity-legendary">LEGENDARY</div>
+                        <p>Assault rifle with fire visual effects.</p>
+                        <div class="item-price">
+                            <i class="fas fa-coins"></i>
+                            <span>8,000 Coins</span>
+                        </div>
+                        <button class="btn" style="width:100%;">BUY NOW</button>
+                    </div>
+                </div>
+                
+                <div class="item-card">
+                    <div class="item-header">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="item-body">
+                        <h3 class="item-name">Frostbite Sniper</h3>
+                        <div class="rarity rarity-epic">EPIC</div>
+                        <p>Sniper rifle with ice trail effect.</p>
+                        <div class="item-price">
+                            <i class="fas fa-coins"></i>
+                            <span>6,500 Coins</span>
+                        </div>
+                        <button class="btn" style="width:100%;">BUY NOW</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Match Types Section -->
+    <section class="match-types" id="matches">
+        <div class="container">
+            <div class="section-title">
+                <h2>MATCH TYPES</h2>
+                <p>Play against AI NPCs or compete in professional ranked matches. Choose your difficulty and climb the leaderboards.</p>
+            </div>
+            
+            <div class="match-grid">
+                <div class="match-card">
+                    <div class="match-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>NPC Matches</h3>
+                    <p>Practice against AI opponents with adjustable difficulty settings.</p>
+                    <div class="match-difficulty difficulty-easy">EASY</div>
+                    <button class="btn">PLAY NOW</button>
+                </div>
+                
+                <div class="match-card">
+                    <div class="match-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Professional Matches</h3>
+                    <p>Compete against real players in ranked matches with leaderboards.</p>
+                    <div class="match-difficulty difficulty-hard">HARD</div>
+                    <button class="btn">JOIN MATCH</button>
+                </div>
+                
+                <div class="match-card">
+                    <div class="match-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Tournament Mode</h3>
+                    <p>Participate in special events and tournaments for exclusive rewards.</p>
+                    <div class="match-difficulty difficulty-pro">PRO</div>
+                    <button class="btn">VIEW EVENTS</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>ARCANE ARENA</h3>
+                    <p>The ultimate 3D battle experience with magic powers, customizable characters, and intense PvP matches.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#characters">Characters</a></li>
+                        <li><a href="#store">Store</a></li>
+                        <li><a href="#matches">Matches</a></li>
+                        <li><a href="#features">Features</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Platforms</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Web Browser</a></li>
+                        <li><a href="#">Windows</a></li>
+                        <li><a href="#">Android</a></li>
+                        <li><a href="#">iOS</a></li>
+                        <li><a href="#">MacOS</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 Arcane Arena. All rights reserved. | Designed for Next-Gen 3D Battle Arena Gaming</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching for store
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const storeItems = document.getElementById('store-items');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // In a real implementation, this would fetch different items from a server
+                // For this demo, we'll just show a message
+                const tabName = button.getAttribute('data-tab');
+                
+                if(tabName === 'characters') {
+                    storeItems.innerHTML = `
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Pyro Blaze</h3>
+                                <div class="rarity rarity-epic">EPIC</div>
+                                <p>Fire-based character with high damage abilities.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>5,000 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                        
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-snowflake"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Frost Nova</h3>
+                                <div class="rarity rarity-rare">RARE</div>
+                                <p>Ice-based character with freezing abilities.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>3,500 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                        
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Volt Surge</h3>
+                                <div class="rarity rarity-epic">EPIC</div>
+                                <p>Electric-based character with stun abilities.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>4,500 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                        
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Shadow Veil</h3>
+                                <div class="rarity rarity-legendary">LEGENDARY</div>
+                                <p>Shadow-based character with stealth abilities.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>7,000 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                    `;
+                } else if(tabName === 'gun-skins') {
+                    storeItems.innerHTML = `
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-gun"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Dragonfire AR</h3>
+                                <div class="rarity rarity-legendary">LEGENDARY</div>
+                                <p>Assault rifle with fire visual effects.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>8,000 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                        
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-gun"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Frostbite Sniper</h3>
+                                <div class="rarity rarity-epic">EPIC</div>
+                                <p>Sniper rifle with ice trail effect.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>6,500 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                        
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-gun"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Thunder SMG</h3>
+                                <div class="rarity rarity-rare">RARE</div>
+                                <p>SMG with electric bolt effects.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>4,000 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                        
+                        <div class="item-card">
+                            <div class="item-header">
+                                <i class="fas fa-gun"></i>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">Shadow Shotgun</h3>
+                                <div class="rarity rarity-epic">EPIC</div>
+                                <p>Shotgun with dark energy effects.</p>
+                                <div class="item-price">
+                                    <i class="fas fa-coins"></i>
+                                    <span>5,500 Coins</span>
+                                </div>
+                                <button class="btn" style="width:100%;">BUY NOW</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    storeItems.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-secondary);">Loading ${tabName} items...</p>`;
+                }
+            });
+        });
+        
+        // Play button functionality
+        document.getElementById('play-btn').addEventListener('click', function() {
+            alert('Starting Arcane Arena... Get ready for battle!');
+        });
+        
+        // Add some interactivity to character selection buttons
+        const characterButtons = document.querySelectorAll('.character-card .btn');
+        characterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const characterName = this.closest('.character-card').querySelector('h3').textContent;
+                alert(`You have selected ${characterName}! Prepare for battle.`);
+            });
+        });
+        
+        // Add some interactivity to store purchase buttons
+        document.addEventListener('click', function(e) {
+            if(e.target && e.target.classList.contains('btn') && 
+               e.target.closest('.item-card')) {
+                const itemName = e.target.closest('.item-card').querySelector('.item-name').textContent;
+                const itemPrice = e.target.closest('.item-card').querySelector('.item-price span').textContent;
+                alert(`Purchased ${itemName} for ${itemPrice}!`);
+            }
+        });
+    </script>
+</body>
+</html>
